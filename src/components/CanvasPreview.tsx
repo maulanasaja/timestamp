@@ -16,6 +16,7 @@ interface CanvasPreviewProps {
     date: string;
     time: string;
     coordinates: [number, number];
+    mapOpacity?: number;
   };
 }
 
@@ -25,22 +26,47 @@ const CanvasPreview = forwardRef<HTMLDivElement, CanvasPreviewProps>(
     let formattedDate = state.date;
     try {
       if (state.date) {
-        const d = new Date(state.date);
-        formattedDate = format(d, "dd MMM yyyy", { locale: id });
+        const parts = state.date.split("-");
+        if (parts.length === 3) {
+          const d = new Date(
+            parseInt(parts[0], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[2], 10)
+          );
+          formattedDate = format(d, "dd MMM yyyy", { locale: id });
+        } else {
+          const d = new Date(state.date);
+          formattedDate = format(d, "dd MMM yyyy", { locale: id });
+        }
       }
     } catch (e) {
       // fallback
     }
 
-    const timeFormatted = state.time ? state.time.replace(/:/g, '.') + '.23' : ''; // Mock seconds for identical match or we can just replace : with .
+    // Format time: HH.mm.ss with user-chosen seconds
+    let timeFormatted = "";
+    if (state.time) {
+      const parts = state.time.split(":");
+      if (parts.length >= 3) {
+        timeFormatted = `${parts[0].padStart(2, "0")}.${parts[1].padStart(2, "0")}.${parts[2].padStart(2, "0")}`;
+      } else if (parts.length === 2) {
+        timeFormatted = `${parts[0].padStart(2, "0")}.${parts[1].padStart(2, "0")}.00`;
+      } else {
+        timeFormatted = state.time.replace(/:/g, ".");
+      }
+    }
 
     // Format coordinates
-    const latStr = Math.abs(state.coordinates[0]).toFixed(5) + "° " + (state.coordinates[0] >= 0 ? "N" : "S");
-    const lngStr = Math.abs(state.coordinates[1]).toFixed(5) + "° " + (state.coordinates[1] >= 0 ? "E" : "W");
+    const lat = state.coordinates?.[0] ?? -6.2;
+    const lng = state.coordinates?.[1] ?? 106.816666;
+    const latStr = Math.abs(lat).toFixed(5) + "° " + (lat >= 0 ? "N" : "S");
+    const lngStr = Math.abs(lng).toFixed(5) + "° " + (lng >= 0 ? "E" : "W");
     const coordinateString = `${latStr}, ${lngStr}`;
 
     // Split location into lines
     const locationLines = state.locationText ? state.locationText.split('\n') : ["Lokasi Belum Diisi"];
+
+    const mapOpacity = typeof state.mapOpacity === "number" ? state.mapOpacity : 0.85;
 
     if (!photoUrl) {
       return (
@@ -64,9 +90,23 @@ const CanvasPreview = forwardRef<HTMLDivElement, CanvasPreviewProps>(
           <div className="overlay-container absolute top-0 left-0 w-full h-full pointer-events-none">
             
             {/* Map on Bottom Left */}
-            <div style={{ position: 'absolute', left: '3cqw', bottom: '3cqw', width: '25cqw', height: '25cqw', padding: '0', pointerEvents: 'auto', overflow: 'hidden', opacity: 0.85, borderRadius: '0.5cqw', border: '2px solid rgba(255,255,255,0.8)' }}>
-               <SafeStaticMap coordinates={state.coordinates} />
-            </div>
+            {mapOpacity > 0 && (
+              <div style={{
+                position: 'absolute',
+                left: '3cqw',
+                bottom: '3cqw',
+                width: '25cqw',
+                height: '25cqw',
+                padding: '0',
+                pointerEvents: 'auto',
+                overflow: 'hidden',
+                opacity: mapOpacity,
+                borderRadius: '0.5cqw',
+                border: `2px solid rgba(255,255,255,${Math.min(1, Math.max(0.15, mapOpacity))})`
+              }}>
+                 <SafeStaticMap coordinates={state.coordinates} />
+              </div>
+            )}
 
             {/* Text on Bottom Right */}
             <div style={{

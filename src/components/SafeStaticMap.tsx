@@ -13,11 +13,15 @@ export default function SafeStaticMap({ coordinates }: SafeStaticMapProps) {
 
   useEffect(() => {
     let active = true;
-    const fetchMap = async () => {
-      if (!coordinates) return;
+    if (!coordinates) return;
+
+    const lat = coordinates[0].toFixed(5);
+    const lng = coordinates[1].toFixed(5);
+
+    const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/map?lat=${coordinates[0]}&lng=${coordinates[1]}`);
+        const res = await fetch(`/api/map?lat=${lat}&lng=${lng}`);
         const data = await res.json();
         if (active && data.dataUrl) {
           setDataUrl(data.dataUrl);
@@ -27,11 +31,13 @@ export default function SafeStaticMap({ coordinates }: SafeStaticMapProps) {
       } finally {
         if (active) setLoading(false);
       }
+    }, 200);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
     };
-    
-    fetchMap();
-    return () => { active = false; };
-  }, [coordinates]);
+  }, [coordinates[0], coordinates[1]]);
 
   if (loading) {
     return (

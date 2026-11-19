@@ -111,7 +111,14 @@ export async function GET(request: NextRequest) {
     const svgBase64 = Buffer.from(svg).toString("base64");
     const dataUrl = `data:image/svg+xml;base64,${svgBase64}`;
 
-    return NextResponse.json({ dataUrl });
+    return NextResponse.json(
+      { dataUrl },
+      {
+        headers: {
+          "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+        },
+      }
+    );
   } catch (error: any) {
     console.error("Map proxy error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

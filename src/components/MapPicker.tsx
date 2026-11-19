@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 
 // Fix Leaflet's default icon path issues with Next.js
 // By passing a valid data URL or an external CDN URL
