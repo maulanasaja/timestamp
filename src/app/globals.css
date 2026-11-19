@@ -1,0 +1,313 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
+:root {
+  --bg-color: #0f172a;
+  --panel-bg: rgba(30, 41, 59, 0.7);
+  --panel-border: rgba(255, 255, 255, 0.1);
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --danger: #ef4444;
+  --font-family: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-color);
+  background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                    radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.15), transparent 25%);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  width: 100vw;
+}
+
+h1, h2, h3, h4, p {
+  margin-bottom: 0.5rem;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family);
+  outline: none;
+}
+
+input, select {
+  font-family: var(--font-family);
+  outline: none;
+}
+
+/* Base App Layout */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  width: 100%;
+}
+@media(min-width: 768px) {
+  .app-container {
+    padding: 2rem;
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header p {
+  color: var(--text-muted);
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+@media(min-width: 900px) {
+  .main-content {
+    grid-template-columns: 1fr 350px;
+  }
+}
+
+.panel {
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+@media(min-width: 768px) {
+  .panel {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+/* Upload Area */
+.upload-area {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.02);
+}
+.upload-area:hover, .upload-area.drag-over {
+  border-color: var(--accent-color);
+  background: rgba(59, 130, 246, 0.05);
+}
+.upload-icon {
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+.upload-text {
+  font-weight: 500;
+  color: var(--text-main);
+}
+.upload-subtext {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* Preview Area */
+.preview-container {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canvas-wrapper {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.canvas-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.overlay-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.timestamp-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.mini-map-container {
+  width: 100px;
+  height: 100px;
+  border: 2px solid white;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #fff;
+  position: relative;
+  pointer-events: auto;
+}
+
+.leaflet-container img {
+  max-width: none !important;
+}
+
+.text-overlay {
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex-grow: 1;
+}
+
+.location-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.location-subtext {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+.datetime-text {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Controls */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.form-group label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.form-control {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--panel-border);
+  color: var(--text-main);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.form-control:focus {
+  border-color: var(--accent-color);
+}
+.map-picker {
+  height: 250px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  overflow: hidden;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.btn {
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+.btn-primary {
+  background: var(--accent-color);
+  color: white;
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.leaflet-control-zoom {
+  border-color: #ccc !important;
+}
+
+.static-map-wrapper .leaflet-control-container {
+  display: none;
+}
